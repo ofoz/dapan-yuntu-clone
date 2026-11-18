@@ -1,0 +1,436 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --font-sans: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+:root {
+  --background: oklch(0.978 0.004 250);
+  --foreground: oklch(0.26 0.02 255);
+  --card: oklch(0.995 0.002 250);
+  --card-foreground: oklch(0.26 0.02 255);
+  --popover: oklch(1 0.001 250);
+  --popover-foreground: oklch(0.26 0.02 255);
+  --primary: oklch(0.3 0.02 255);
+  --primary-foreground: oklch(0.99 0.002 250);
+  --secondary: oklch(0.95 0.006 250);
+  --secondary-foreground: oklch(0.3 0.02 255);
+  --muted: oklch(0.948 0.006 250);
+  --muted-foreground: oklch(0.48 0.016 255);
+  --accent: oklch(0.948 0.006 250);
+  --accent-foreground: oklch(0.3 0.02 255);
+  --destructive: oklch(0.58 0.2 27);
+  --border: oklch(0.875 0.01 250);
+  --input: oklch(0.875 0.01 250);
+  --ring: color-mix(in srgb, var(--foreground) 18%, transparent);
+  --brand: #ef4444;
+  --brand-foreground: #ffffff;
+}
+
+.dark {
+  --background: oklch(0.2 0.01 247);
+  --foreground: oklch(0.92 0.005 247);
+  --card: oklch(0.25 0.012 247);
+  --card-foreground: oklch(0.92 0.005 247);
+  --popover: oklch(0.25 0.012 247);
+  --popover-foreground: oklch(0.92 0.005 247);
+  --primary: oklch(0.88 0.005 247);
+  --primary-foreground: oklch(0.22 0.012 247);
+  --secondary: oklch(0.3 0.012 247);
+  --secondary-foreground: oklch(0.92 0.005 247);
+  --muted: oklch(0.3 0.012 247);
+  --muted-foreground: oklch(0.7 0.01 247);
+  --accent: oklch(0.3 0.012 247);
+  --accent-foreground: oklch(0.92 0.005 247);
+  --destructive: oklch(0.68 0.17 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: color-mix(in srgb, var(--foreground) 22%, transparent);
+  --brand: #ef4444;
+  --brand-foreground: #ffffff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html,
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Smooth anchor jumps (TOC, in-page links). */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--brand) 20%, transparent);
+  }
+}
+
+/* The heatmap page locks scrolling; content pages scroll normally. */
+html.heatmap-page-active,
+html.heatmap-page-active body {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+/* Top-edge loading bar on the bottom toolbar. */
+.hm-bottom-loader {
+  position: absolute;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--brand) 26%, transparent);
+}
+.hm-bottom-loader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--brand) 50%, transparent 100%);
+  animation: hm-bottom-loader 1.3s ease-in-out infinite;
+}
+@keyframes hm-bottom-loader {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(110%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-bottom-loader::after {
+    animation: none;
+    background: var(--brand);
+    opacity: 0.6;
+  }
+}
+
+/* ---------------------------------- */
+/* Marketing pages (features, changelog, blog) */
+/* ---------------------------------- */
+
+/* Content stays visible until JS opts it into scroll-reveal. */
+.reveal {
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-pending {
+  opacity: 0;
+  transform: translateY(24px);
+}
+.reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hero entrance. */
+@keyframes marketing-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.marketing-fade-up {
+  animation: marketing-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Route view transitions: the old page leaves fast, the new one arrives gently. */
+::view-transition-old(.page-exit) {
+  animation: vt-page-out 140ms ease-in both;
+}
+::view-transition-new(.page-enter) {
+  animation: vt-page-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes vt-page-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Let clicks pass through the transition overlay to the live page. */
+::view-transition {
+  pointer-events: none;
+}
+
+/* Entrance fallback for runtimes without working view transitions: plays on
+   mount whenever the page shell remounts (navigation, slug change). */
+.page-enter-fallback {
+  animation: vt-page-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Gentle breathing on hero badge dots keeps page tops feeling alive. */
+.hero-dot {
+  animation: hero-dot-pulse 2.6s ease-in-out infinite;
+}
+@keyframes hero-dot-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Subtle dotted grid backdrop, fading out towards the bottom. */
+.marketing-grid-bg {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--foreground) 14%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 25%, transparent 78%);
+}
+
+/* Soft radial glow behind hero content. */
+.marketing-glow {
+  background:
+    radial-gradient(
+      42rem 20rem at 20% -10%,
+      color-mix(in srgb, var(--brand) 10%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      42rem 22rem at 85% 0%,
+      color-mix(in srgb, var(--foreground) 7%, transparent),
+      transparent 70%
+    );
+}
+
+/* Card hover micro-interaction for feature/link cards. */
+.marketing-card {
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.marketing-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--foreground) 22%, transparent);
+  box-shadow: 0 12px 32px -16px color-mix(in srgb, black 35%, transparent);
+}
+
+/* Opacity-only entrance shared by the reduced-motion variants below.
+   Motion sensitivity is triggered by positional movement and looping
+   effects — gentle fades stay acceptable and keep pages feeling alive. */
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .marketing-card:hover {
+    transform: none;
+  }
+  .marketing-fade-up {
+    animation: vt-fade-in 0.5s ease both;
+  }
+  .page-enter-fallback {
+    animation: vt-fade-in 0.3s ease both;
+  }
+  /* Decorative loops keep still under reduced motion. */
+  .hero-dot,
+  .heart-beat {
+    animation: none;
+  }
+  /* View transitions: no positional movement or size morphing; the page
+     pair keeps a quick opacity crossfade, everything else snaps. */
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  ::view-transition-old(.page-exit) {
+    animation: vt-fade-in 140ms ease both;
+  }
+  ::view-transition-new(.page-enter) {
+    animation: vt-fade-in 200ms ease both;
+  }
+}
+
+/* Long-form MDX article typography. */
+.mdx-content {
+  line-height: 1.85;
+}
+.mdx-content > :first-child {
+  margin-top: 0;
+}
+.mdx-content h2 {
+  margin: 2.5em 0 0.75em;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.mdx-content h3 {
+  margin: 2em 0 0.6em;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+.mdx-content p {
+  margin: 1em 0;
+  color: color-mix(in srgb, var(--foreground) 88%, var(--muted-foreground));
+}
+.mdx-content ul,
+.mdx-content ol {
+  margin: 1em 0;
+  padding-left: 1.4em;
+  color: color-mix(in srgb, var(--foreground) 88%, var(--muted-foreground));
+}
+.mdx-content ul {
+  list-style: disc;
+}
+.mdx-content ol {
+  list-style: decimal;
+}
+.mdx-content li {
+  margin: 0.4em 0;
+}
+.mdx-content li::marker {
+  color: var(--muted-foreground);
+}
+.mdx-content a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--brand) 40%, transparent);
+}
+.mdx-content a:hover {
+  text-decoration-color: var(--brand);
+}
+.mdx-content strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
+.mdx-content blockquote {
+  margin: 1.5em 0;
+  padding: 0.6em 1.2em;
+  border-left: 2px solid var(--brand);
+  border-radius: 0 0.5rem 0.5rem 0;
+  background: color-mix(in srgb, var(--brand) 6%, transparent);
+  color: var(--muted-foreground);
+}
+.mdx-content code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  padding: 0.15em 0.4em;
+}
+.mdx-content pre {
+  margin: 1.5em 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  line-height: 1.7;
+}
+.mdx-content pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 0.8125rem;
+}
+
+/* CodeBlock component: the framed figure provides chrome, the pre stays flush. */
+.mdx-content .code-block pre {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.mdx-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+}
+.mdx-content hr {
+  margin: 2.5em 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+/* Tables render as rounded cards; .table-wrap keeps wide tables scrollable
+   on small screens instead of overflowing the article column. */
+.mdx-content .table-wrap {
+  margin: 1.5em 0;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+.mdx-content table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+.mdx-content th,
+.mdx-content td {
+  border: 0;
+  border-top: 1px solid var(--border);
+  padding: 0.55em 0.9em;
+  text-align: left;
+}
+.mdx-content thead th {
+  border-top: 0;
+  background: var(--muted);
+  font-weight: 600;
+}
+.mdx-content tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
+}

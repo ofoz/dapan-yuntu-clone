@@ -1,16 +1,11 @@
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-
-# 运行时缓存（行情历史/快照缓存，运行时自动重建）
-cache/
-
-# 编辑器 / 系统
-.DS_Store
-.vscode/
-.idea/
-*.swp
-
-# 日志
+node_modules
+.next
+out
+build
+.vercel
+.env*
+!.env.example
 *.log
+tsconfig.tsbuildinfo
+.DS_Store
+.zcode/
